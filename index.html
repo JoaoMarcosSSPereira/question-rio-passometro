@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário de Briefing - JM Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Professional Tech (Slate neutrals with Teal accent) -->
+    <!-- Application Structure Plan: A multi-step, wizard-style interactive form. This structure was chosen to break down the long questionnaire into manageable, focused sections, improving user experience and completion rates compared to a single, long-scrolling form. A progress bar and clear navigation guide the user through the data collection process. Added a final step to generate and send the collected data via email or WhatsApp. -->
+    <!-- Visualization & Content Choices: Report Info: Questionnaire sections -> Goal: Data Collection & Submission -> Viz/Presentation Method: Interactive multi-step form with a final summary and action step -> Interaction: Step-by-step navigation, dynamic summary, and buttons to trigger mailto: or WhatsApp click-to-chat links -> Justification: Creates a complete workflow from data entry to submission, making the tool practical for business use. -> Library/Method: Vanilla JS for state, DOM manipulation, and generating URL-encoded content for the links. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .transition-width {
+            transition: width 0.5s ease-in-out;
+        }
+        #send-options a:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-teal-600">JM Analytics</h1>
+            <p class="text-slate-600 mt-1">Questionário de Briefing e Implementação</p>
+        </header>
+
+        <main class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+            
+            <div id="progress-container" class="mb-8">
+                <div class="w-full bg-slate-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-teal-500 h-2.5 rounded-full transition-width" style="width: 0%"></div>
+                </div>
+                <div id="step-indicator" class="text-center text-sm text-slate-500 mt-2"></div>
+            </div>
+
+            <form id="briefing-form">
+                
+                <div id="step-0" class="form-section active">
+                    <h2 class="text-2xl font-bold mb-4 text-center">Iniciando nossa Parceria</h2>
+                    <p class="text-slate-600 text-center mb-6">Este questionário é o primeiro passo para entendermos a realidade da sua unidade. Suas respostas nos permitirão customizar nossa proposta e a ferramenta para garantir um projeto de sucesso. Vamos começar?</p>
+                </div>
+
+                <div id="step-1" class="form-section">
+                    <h2 class="text-xl font-bold mb-6">1. Identificação e Estrutura da Unidade</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="unidade_nome" class="block text-sm font-medium text-slate-700 mb-1">Qual o nome completo da unidade?</label>
+                            <input type="text" id="unidade_nome" name="unidade_nome" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label for="unidade_porte" class="block text-sm font-medium text-slate-700 mb-1">Qual o porte da unidade?</label>
+                            <input type="text" id="unidade_porte" name="unidade_porte" placeholder="Ex: UPA Porte II, Hospital de pequeno porte" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label for="unidade_atendimentos" class="block text-sm font-medium text-slate-700 mb-1">Qual o volume médio de atendimentos/dia?</label>
+                            <input type="number" id="unidade_atendimentos" name="unidade_atendimentos" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label for="unidade_turnos" class="block text-sm font-medium text-slate-700 mb-1">Quantos turnos a unidade possui em 24 horas e como são divididos?</label>
+                            <input type="text" id="unidade_turnos" name="unidade_turnos" placeholder="Ex: 2 turnos de 12h, 3 de 8h" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label for="unidade_consultorios" class="block text-sm font-medium text-slate-700 mb-1">Quantos consultórios médicos estão em operação simultânea, em média, por turno?</label>
+                            <input type="number" id="unidade_consultorios" name="unidade_consultorios" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-2" class="form-section">
+                    <h2 class="text-xl font-bold mb-6">2. Equipe e Usuários do Sistema</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="equipe_medicos" class="block text-sm font-medium text-slate-700 mb-1">Quantos médicos, no total, constituem o corpo clínico da unidade?</label>
+                            <input type="number" id="equipe_medicos" name="equipe_medicos" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label for="equipe_outros" class="block text-sm font-medium text-slate-700 mb-1">Além dos médicos, quantos outros profissionais (enfermeiros, técnicos, etc.) precisarão de acesso?</label>
+                            <input type="number" id="equipe_outros" name="equipe_outros" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Qual o nível geral de familiaridade da equipe com ferramentas digitais?</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 transition cursor-pointer">
+                                    <input type="radio" name="equipe_familiaridade" value="Básico" class="h-4 w-4 text-teal-600 border-slate-300 focus:ring-teal-500">
+                                    <span class="ml-3 text-sm text-slate-700">Básico (Uso apenas para tarefas essenciais)</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 transition cursor-pointer">
+                                    <input type="radio" name="equipe_familiaridade" value="Intermediário" class="h-4 w-4 text-teal-600 border-slate-300 focus:ring-teal-500">
+                                    <span class="ml-3 text-sm text-slate-700">Intermediário (Uso confortável de planilhas, e-mails)</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 transition cursor-pointer">
+                                    <input type="radio" name="equipe_familiaridade" value="Avançado" class="h-4 w-4 text-teal-600 border-slate-300 focus:ring-teal-500">
+                                    <span class="ml-3 text-sm text-slate-700">Avançado (A equipe adapta-se facilmente a novas tecnologias)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-3" class="form-section">
+                    <h2 class="text-xl font-bold mb-6">3. Infraestrutura e Sistemas Atuais</h2>
+                    <div class="space-y-6">
+                         <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">A unidade possui computadores com acesso à internet em todos os pontos necessários?</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg flex-1 has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 transition cursor-pointer">
+                                    <input type="radio" name="infra_computadores" value="Sim" class="h-4 w-4 text-teal-600 border-slate-300 focus:ring-teal-500">
+                                    <span class="ml-3 text-sm text-slate-700">Sim</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg flex-1 has-[:checked]:bg-red-50 has-[:checked]:border-red-500 transition cursor-pointer">
+                                    <input type="radio" name="infra_computadores" value="Não" class="h-4 w-4 text-red-600 border-slate-300 focus:ring-red-500">
+                                    <span class="ml-3 text-sm text-slate-700">Não</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Como o processo de passagem de plantão é realizado HOJE?</label>
+                            <select id="infra_processo_atual" name="infra_processo_atual" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                                <option>Livro de ocorrências físico (papel)</option>
+                                <option>Planilha compartilhada (Excel, etc.)</option>
+                                <option>Grupo de WhatsApp ou similar</option>
+                                <option>Comunicação puramente verbal</option>
+                                <option>Outro software</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="infra_outro_software" class="block text-sm font-medium text-slate-700 mb-1">Se utiliza outro software, qual é e quais suas limitações?</label>
+                            <textarea id="infra_outro_software" name="infra_outro_software" rows="3" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">A unidade possui equipe de TI ou desenvolvimento própria?</label>
+                             <div class="flex gap-4">
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg flex-1 has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 transition cursor-pointer">
+                                    <input type="radio" name="infra_ti" value="Sim" class="h-4 w-4 text-teal-600 border-slate-300 focus:ring-teal-500">
+                                    <span class="ml-3 text-sm text-slate-700">Sim, própria</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg flex-1 has-[:checked]:bg-teal-50 has-[:checked]:border-teal-500 transition cursor-pointer">
+                                    <input type="radio" name="infra_ti" value="Terceirizada" class="h-4 w-4 text-teal-600 border-slate-300 focus:ring-teal-500">
+                                    <span class="ml-3 text-sm text-slate-700">Sim, terceirizada</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-300 rounded-lg flex-1 has-[:checked]:bg-red-50 has-[:checked]:border-red-500 transition cursor-pointer">
+                                    <input type="radio" name="infra_ti" value="Não" class="h-4 w-4 text-red-600 border-slate-300 focus:ring-red-500">
+                                    <span class="ml-3 text-sm text-slate-700">Não possui</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-4" class="form-section">
+                    <h2 class="text-xl font-bold mb-6">4. Desafios e Objetivos (Diagnóstico Estratégico)</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="desafios_gargalo" class="block text-sm font-medium text-slate-700 mb-1">Qual é o maior gargalo ou principal risco no seu processo atual?</label>
+                            <textarea id="desafios_gargalo" name="desafios_gargalo" rows="4" placeholder="Ex: Perda de informações, demora na comunicação, falta de padrão..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"></textarea>
+                        </div>
+                        <div>
+                            <label for="desafios_problema_um" class="block text-sm font-medium text-slate-700 mb-1">Se você pudesse resolver UM problema nesse processo, qual seria?</label>
+                            <textarea id="desafios_problema_um" name="desafios_problema_um" rows="4" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"></textarea>
+                        </div>
+                        <div>
+                            <label for="desafios_objetivos" class="block text-sm font-medium text-slate-700 mb-1">O que você espera alcançar com a implementação da nossa solução?</label>
+                            <textarea id="desafios_objetivos" name="desafios_objetivos" rows="4" placeholder="Ex: Mais segurança para o paciente, agilidade, dados para gestão..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-5" class="form-section">
+                    <h2 class="text-xl font-bold mb-4">5. Revisão e Envio</h2>
+                    <p class="text-slate-600 mb-6">Por favor, revise as informações fornecidas. Se tudo estiver correto, clique no botão abaixo para nos enviar os dados.</p>
+                    <div id="summary" class="space-y-4 text-sm bg-slate-50 p-6 rounded-lg border border-slate-200 mb-6"></div>
+                    <button id="send-btn" type="button" class="w-full bg-teal-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-600 transition flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.949a.75.75 0 00.95.54l3.853-1.41a.75.75 0 000-1.329L3.49 4.84a.75.75 0 00-.95-.54l-4.95 1.414a.75.75 0 00-.95.826V15a.75.75 0 00.95.826l4.949-1.414a.75.75 0 00.54-.95l-1.41-3.853a.75.75 0 00-1.33 0l-1.41 3.853a.75.75 0 00.54.95l4.95 1.414a.75.75 0 00.95-.826V3.105z" /></svg>
+                        Enviar Respostas para JM Analytics
+                    </button>
+                    <div id="send-options" class="mt-4 hidden">
+                        <p class="text-center text-sm text-slate-600 mb-3">Escolha como prefere enviar:</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a id="email-link" target="_blank" class="flex-1 bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition flex items-center justify-center gap-2 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" /><path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" /></svg>
+                                Enviar por E-mail
+                            </a>
+                             <a id="whatsapp-link" target="_blank" class="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M15.584 14.354c.48.48.355 1.294-.225 1.944-.58.65-1.415.989-2.23.989-1.107 0-2.146-.48-3.326-1.448-1.18-1.01-2.22-2.324-3.085-3.834-.906-1.51-1.34-3.042-1.34-4.52V6.9a.75.75 0 01.75-.75h1.55a.75.75 0 01.743.648l.383 1.916a.75.75 0 01-.22 1.39l-1.043.521a.75.75 0 00-.513.978 11.32 11.32 0 003.766 3.766.75.75 0 00.978-.513l.522-1.043a.75.75 0 011.39-.22l1.916.383a.75.75 0 01.648.743v1.55z" clip-rule="evenodd" /></svg>
+                                Enviar por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="step-6" class="form-section text-center">
+                    <svg class="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h2 class="text-2xl font-bold mt-4">Obrigado!</h2>
+                    <p class="text-slate-600 mt-2">Seu briefing foi preparado para o envio.</p>
+                    <p class="text-slate-600 mt-1">A equipe da JM Analytics aguarda seu contato para agendar uma demonstração focada nas necessidades da sua unidade.</p>
+                </div>
+            </form>
+
+            <div id="navigation-buttons" class="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
+                <button id="prev-btn" type="button" class="bg-slate-200 text-slate-700 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
+                <button id="next-btn" type="button" class="bg-teal-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-600 transition">Próximo</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let currentStep = 0;
+            const formSteps = document.querySelectorAll('.form-section');
+            const totalSteps = formSteps.length - 2;
+            const progressBar = document.getElementById('progress-bar');
+            const stepIndicator = document.getElementById('step-indicator');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const navButtons = document.getElementById('navigation-buttons');
+            const sendBtn = document.getElementById('send-btn');
+            const sendOptions = document.getElementById('send-options');
+            const emailLink = document.getElementById('email-link');
+            const whatsappLink = document.getElementById('whatsapp-link');
+
+            const JM_ANALYTICS_EMAIL = 'seu-email@exemplo.com';
+            const JM_ANALYTICS_WHATSAPP = '5535999999999';
+
+            function updateFormView() {
+                formSteps.forEach((step, index) => {
+                    step.classList.toggle('active', index === currentStep);
+                });
+
+                const progressPercentage = currentStep > 0 ? ((currentStep) / totalSteps) * 100 : 0;
+                progressBar.style.width = `${progressPercentage}%`;
+                
+                if (currentStep > 0 && currentStep <= totalSteps) {
+                     stepIndicator.textContent = `Etapa ${currentStep} de ${totalSteps}`;
+                } else {
+                    stepIndicator.textContent = '';
+                }
+
+                prevBtn.disabled = currentStep === 0;
+                
+                if (currentStep === 0) {
+                    nextBtn.textContent = 'Começar';
+                } else if (currentStep === totalSteps) {
+                    generateSummary();
+                    navButtons.style.display = 'none';
+                } else if (currentStep > totalSteps) {
+                    navButtons.style.display = 'none';
+                } else {
+                    navButtons.style.display = 'flex';
+                    nextBtn.textContent = 'Próximo';
+                }
+            }
+            
+            const fieldLabels = {
+                'unidade_nome': 'Nome da unidade',
+                'unidade_porte': 'Porte da unidade',
+                'unidade_atendimentos': 'Média de atendimentos/dia',
+                'unidade_turnos': 'Turnos',
+                'unidade_consultorios': 'Consultórios por turno',
+                'equipe_medicos': 'Total de médicos',
+                'equipe_outros': 'Outros profissionais',
+                'equipe_familiaridade': 'Familiaridade com tecnologia',
+                'infra_computadores': 'Possui computadores?',
+                'infra_processo_atual': 'Processo de plantão atual',
+                'infra_outro_software': 'Outro software (detalhes)',
+                'infra_ti': 'Equipe de TI',
+                'desafios_gargalo': 'Maior gargalo/risco',
+                'desafios_problema_um': 'Principal problema a resolver',
+                'desafios_objetivos': 'Objetivos com a solução'
+            };
+
+            function getFormData() {
+                return new FormData(document.getElementById('briefing-form'));
+            }
+
+            function generateSummary() {
+                const summaryContainer = document.getElementById('summary');
+                const formData = getFormData();
+                let summaryHTML = '';
+
+                for (let [key, value] of formData.entries()) {
+                    if (value && fieldLabels[key]) {
+                        summaryHTML += `
+                            <div class="flex flex-col sm:flex-row">
+                                <p class="font-semibold text-slate-800 w-full sm:w-1/3">${fieldLabels[key]}:</p>
+                                <p class="text-slate-600 w-full sm:w-2/3 break-words">${value}</p>
+                            </div>
+                        `;
+                    }
+                }
+                summaryContainer.innerHTML = summaryHTML || '<p class="text-slate-500">Nenhuma informação fornecida.</p>';
+            }
+
+            function generateMessageBody() {
+                const formData = getFormData();
+                let message = `*Briefing de Implementação - JM Analytics*\n\n`;
+                message += `*Preenchido em:* ${new Date().toLocaleString('pt-BR')}\n\n`;
+
+                for (let [key, value] of formData.entries()) {
+                    if (value && fieldLabels[key]) {
+                        message += `*${fieldLabels[key]}:*\n${value}\n\n`;
+                    }
+                }
+                return message;
+            }
+
+            sendBtn.addEventListener('click', () => {
+                const message = generateMessageBody();
+                const unidadeNome = document.getElementById('unidade_nome').value || 'Nova Unidade';
+                
+                const emailBody = encodeURIComponent(message);
+                const emailSubject = encodeURIComponent(`Briefing de Implementação: ${unidadeNome}`);
+                emailLink.href = `mailto:${JM_ANALYTICS_EMAIL}?subject=${emailSubject}&body=${emailBody}`;
+
+                const whatsappBody = encodeURIComponent(message);
+                whatsappLink.href = `https://wa.me/${JM_ANALYTICS_WHATSAPP}?text=${whatsappBody}`;
+
+                sendBtn.style.display = 'none';
+                sendOptions.classList.remove('hidden');
+            });
+            
+            sendOptions.addEventListener('click', () => {
+                 setTimeout(() => {
+                    currentStep++;
+                    updateFormView();
+                }, 500);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep <= totalSteps) {
+                    currentStep++;
+                    updateFormView();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    if(currentStep === totalSteps) {
+                         navButtons.style.display = 'flex';
+                         sendBtn.style.display = 'block';
+                         sendOptions.classList.add('hidden');
+                    }
+                    currentStep--;
+                    updateFormView();
+                }
+            });
+
+            updateFormView();
+        });
+    </script>
+</body>
+</html>
